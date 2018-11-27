@@ -192,7 +192,7 @@ int main(){
         }
         cout<<"]\t";
     }
-
+    getchar();
 }
 
 
