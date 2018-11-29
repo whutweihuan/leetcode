@@ -1,8 +1,8 @@
 /***********************************************
 #
 #        Author: weihuan -whutweihuan@163.com
-#        Create: 2018-11-17 
-# Last Modified: 2018-11-17 
+#        Create: 2018-11-29 
+# Last Modified: 2018-11-29 
 #          Link: https://leetcode.com/problems/remove-nth-node-from-end-of-list/
 #         title: 19 Remove Nth Node From End of List
 #   Description: ---
