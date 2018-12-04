@@ -34,7 +34,6 @@ public:
         //string temp ="(";
         
         dfs(n,n,"");
-        cout<<cnt<<endl;
 
         return result;
     }
@@ -56,7 +55,7 @@ public:
 
 int main(){
     Solution ss;
-    int n = 8;
+    int n = 4;
     for(string s: ss.generateParenthesis(n)){
         cout<<s<<"\n";
     }
