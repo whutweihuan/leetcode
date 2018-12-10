@@ -1,0 +1,497 @@
+/**************************************************
+ ****************** 建表 *************************
+
+ GROUP BY departmentId  (HAVING(departmentId) >2);
+
+ 
+ CREATE TABLE employee (
+	employeeID CHAR(6) NOT NULL PRIMARY KEY,		
+	name CHAR(10) NOT NULL,					
+	education CHAR(4) NOT NULL,				
+    birth DATE NOT NULL,					    
+	gender TINYINT(1) NOT NULL DEFAULT 1,	
+	workYear TINYINT(1),					
+	address VARCHAR(100),					
+	phone CHAR(12),		
+    departmentID CHAR(3),
+    Foreign Key(departmentID) REFERENES department(departmentID)
+);
+
+
+CREATE TABLE department (
+	departmentID CHAR(3) PRIMARY KEY,		
+	departName CHAR(20) NOT NULL,			
+	comment VARCHAR(100)					
+);
+
+CREATE TABLE salary (
+	employeeID CHAR(6) REFERENCES employees(employeeID), 		
+	income REAL,						
+	outcome REAL,						
+PRIMARY KEY(employeeID)
+);
+
+
+LOAD DATA INFILE 'salary.csv' INTO TABLE salary
+CHARACTER SET gbk
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\r\n';
+
+********************************************
+********************************************/
+
+
+
+
+
+实验1.1 数据库定义实验
+（1） 创 建student_copy1 表：
+CREATE TABLE student_copy1 LIKE student;
+（2） 创 建student_copy2 表：
+CREATE TABLE student_copy2 AS (SELECT * FROM student);
+思考：有何区别？
+
+第一个构建的表中有主键，没有数据
+第二个构建的表中有数据，没有主键
+
+
+
+
+
+
+
+
+
+
+实验2.1 索引实验
+
+
+
+三、实验任务
+ 思考与练习
+ 使用CREATE INDEX语句能创建主键吗？添加主键与添加普通索引有
+什么区别？
+ 如果删除基本表的一个列或者多个列，该列上的索引会受怎样的影响
+
+//000001     | 王林   | 大专      | 1966-01-23 |      1 |        8 | 中山路32号    | 83355668 | 2
+
+INSERT INTO employee1 (employeeID,name ,education ,birth ,gender ,workYear ,address , phone ,departmentID) VALUES ( '000001' ,'王林' , '大专'  ,'1966-01-23'  ,1 , 8 ,'中山路32号 ' , 83355668 , 2);
+
+INSERT INTO salary1 (employeeID , income  , outcome) VALUES (  '000001'  , 2100.8 ,  123.09);
+
+ 000001     |  2100.8 |  123.09
+
+
+ SELECT MAX(salary.income),MIN(salary.income) FROM salary,employee WHERE employee.departmentID = 1 AND employee.employeeID = salary.employeeID;
+
+
+//使用内连接查询名字为“王林”的员工所在部门
+SELECT departName FROM department  inner  JOIN employee  ON department.departmentId = employee.departmentId  where employee.name = '王林';
+
+question： Subquery returns more than 1 row
+using In not ==
+
+
+//查找员工数超过2人的部门名称和员工数量
+SELECT (SELECT departName FROM department where departmentID = employee.departmentID )as '部门' ,count(employeeId) as '人数' FROM employee GROUP BY departmentId HAVING count(employeeId) > 2;
+
+
+/*******************************************
+********** 实验1.4 视图实验 ****************
+ 
+//创建DBEM数据库上的视图v_dp，包含department的全部信息
+CREATE VIEW v_dp AS SELECT * FROM department;
+
+//创建DBEM数据库上的视图v_em，包含员工号码、姓名和实际收入
+CREATE VIEW  v_em  AS SELECT employee.employeeID ,employee.name ,income FROM employee,salary;
+
+//从v_em视图中查询姓名为“王林”的员工的实际收入
+SELECT income FROM v_em WHERE name="王林";
+
+
+//向v_dp视图中插入一行数据：6，广告部，推广产品。执行完之后分
+别查看视图v_dp和表department中发生的变化
+INSERT INTO v_dp VALUES(6,'广告部','推广产品') ;
+
+//尝试向v_em视图中插入一行数据，看看会发生什么情况
+| employeeID | name   | income  |
++------------+--------+---------+
+| 000001     | 王林   |  2100.8 |
+| 010008     | 伍容华 | 1582.62 |
+| 020010     | 王向容 |    2860 |
+| 020018     | 李丽   | 2347.68 |
+| 102201     | 刘明   | 2569.88 |
+| 102208     | 朱俊   |    1980 |
+| 108991     | 钟敏   | 3259.98 |
+| 111006     | 张石兵 | 1987.01 |
+| 210678     | 林涛   |    2240 |
+| 302566     | 李玉珉 |  2980.7 |
+| 308759     | 叶凡   | 2531.98 |
+| 504209     | 陈林琳 | 2066.15 |
++------------+--------+---------+
+mysql> INSERT INTO v_em VALUES('00002','危欢',5000);
+ERROR 1394 (HY000): Can not insert into join view 'dbem.v_em' without fields list
+
+//修改视图v_em中号码为000001的雇员的姓名为“王浩”
+UPDATE v_em
+SET name = '王浩'
+WHERE employeeID = '000001';
+
+//删除视图v_dp中部门号为“1”的数据
++--------------+------------+----------+
+| departmentID | departName | comment  |
++--------------+------------+----------+
+| 1            | 财务部     | NULL     |
+| 2            | 人力资源部 | NULL     |
+| 3            | 经理办公室 | NULL     |
+| 4            | 研发部     | NULL     |
+| 5            | 市场部     | NULL     |
+| 6            | 广告部     | 推广产品 |
++--------------+------------+----------+
+DELETE FROM v_dp
+WHERE departmentID = 1;
+
+实验1.4 视图实验
+三、实验任务
+ 思考与练习
+ 如果视图关联了一个表中的所有字段，而该表中添加了新字段，视图
+中是否能查询到新字段？
+ 视图v_em中无法插入和删除数据，为什么？
+
+CREATE VIEW test_view 
+AS SELECT salary.employeeID ,salary.income,salary.outcome, department.departmentID FROM salary ,department;
+ 
+
+FROM子句中包含多个表；
+
+/*******************************************
+********** 实验2.1 索引实验 ****************
+
+//在department表的departName字段上创建唯一性索引
+CREATE UNIQUE INDEX uindex  ON department(departName);
+
+//在employee表的name和address两个字段上创建一个复合索引
+CREATE INDEX pindex ON employee(name, address);
+
+//创建与department表相同结构的表department1，并将departName
+设为主键，departmentID上建立一个索引
+CREATE TABLE department1 (
+	departmentID CHAR(3) ,		
+	departName CHAR(20) NOT NULL,			
+	comment VARCHAR(100),
+    PRIMARY KEY (departName),
+    INDEX (departmentID)
+);
+
+
+//创建一个包含(employeeID, name, education)等字段的临时员工表
+(tmpEmployee) ，并在该表的员工编号字段上创建一个HASH索引
+CREATE TABLE tmpEmployee (
+	employeeID CHAR(3) ,		
+	name CHAR(20) NOT NULL,			
+	education VARCHAR(100),
+);
+
+
+
+//使用CREATE INDEX语句能创建主键吗？添加主键与添加普通索引有
+什么区别?
+
+显然不行………… 他语法不是写清楚了吗，只能是[UNIQUE|FULLTEXT|SPATIAL]
+你看了手册，但是没看全，底下还有一句话：
+CREATE INDEX cannot be used to create a PRIMARY KEY; use ALTER TABLE instead.
+
+添加主键会自动创建主键索引， 普通索引需要自己手动去添加和指定，
+表中效率最高的索引就是主键索引
+
+
+//如果删除基本表的一个列或者多个列，该列上的索引会受怎样的影响？
+被删除
+
+//删除字段 
+ALTER TABLE department DROP COLUMN departmentID; 
+
+//增加字段 
+ALTER TABLE department ADD COLUMN departmentID int(255);
+
+//添加主键
+ALTER TABLE tb ADD PRIMARY KEY(id);
+
+//删除主建
+ALTER TABLE tb DROP PRIMARY KEY//
+
+/*************************************************
+********** 实验2.2 实体完整性实验 ****************
+
+//创建一个表employee1，只含employeeID、name、gender和
+education列。以name为主键作为列name的完整性约束，
+employeeID为替代键作为表的完整性约束
+CREATE TABLE employee1 (
+	employeeID CHAR(3) ,		
+	name CHAR(20) NOT NULL,			
+	education VARCHAR(100),
+    gender int(10),
+    PRIMARY KEY (name),
+    UNIQUE(employeeID)
+);
+
+//定义不含主键的表employee2，包含上述属性列，然后定义实体完整
+性，以employeeID为主码
+CREATE TABLE employee2 (
+	employeeID CHAR(3) ,		
+	name CHAR(20) NOT NULL,			
+	education VARCHAR(100),
+    gender int(10)
+);
+alter table add primary key (employeeID);
+
+//设计记录增加到employee1表和employee2表，验证实体完整
+性是否起作用
+
+/*************************************************
+********** 实验2.3 参照完整性实验 ****************
+
+//关系的完整性是关系型数据模型结构中的另一组成部分，它分为实体完整性、参照完整性和用户定义完整性三类。
+在关系数据库中一个关系对应现实世界的一个实体集，关系中的每一个元组对应一个实体。在关系中用主关键字来唯一标识一个实体，
+实体具有独立性，关系中的这种约束条件称为实体完整性。参照完整性是用于约定两个关系之间的联系，
+理论上规定：若M是关系S中的一属性组，且M是另一关系Z的主关键字，则称M为关系S对应关系Z的外关键字。
+若M是关系S的外关键字，则S中每一个元组在M上的值必须是空值或是对应关系Z中某个元组的主关键字值。
+例如，学生关系S和学校专业关系Z之间满足参照完整性约束。学校专业关系Z中的专业号属性是主关键字，
+同时它也存在学生关系S中，那么只有当专业号存在，这个专业的学生才有可能存在，因此在添加学生关系中的元组时，
+定义的专业号必须在学校专业关系Z中已存在对应的元组。用户定义完整性约束是用户定义某个具体数据库所涉及的数据
+必须满足的约束条件，是由具体应用环境来决定的。例如，约定学生成绩的数据必须小于或等于100。
+
+
+$$ 不同参照动作含义
+RESTRICT：当要删除或更新父表中被参照列上在外键中出现的值时，
+          拒绝对父表的删除或更新操作
+CASCADE： 从父表删除或更新行时自动删除或更新子表中匹配的行
+SET NULL：当从父表删除或更新行时，设置子表中与之对应的外键
+          列为NULL。如果外键列没有指定NOT NULL限定词，这就是合法的
+NO ACTION：NO ACTION意味着不采取动作，就是如果有一个相关
+           的外键值在被参考的表里，删除或更新父表中主要键值的企图不被允
+            许，和RESTRICT一样
+SET DEFAULT：作用和SET NULL一样，只不过SET DEFAULT是指定
+             子表中的外键列为默认值
+
+
+//创建一个表salary1，要求所有salary1表上出现的employeeID都要
+出现在salary表中，利用完整性约束实现，要求当删除或修改salary
+表上的employeeID列时，salary1表中的值也随之变化
+CREATE TABLE salary1 (
+	employeeID CHAR(6) , 		
+	income REAL,						
+	outcome REAL,						
+    PRIMARY KEY(employeeID),
+    FOREIGN KEY(employeeId) REFERENCES salary(employeeID) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE
+);
+
+//复制旧表的数据到新表(假设两个表结构一样)
+INSERT INTO 新表 SELECT * FROM 旧表
+//复制旧表的数据到新表(假设两个表结构不一样)
+INSERT INTO 新表(字段1,字段2,.......) SELECT 字段1,字段2,...... FROM 旧表
+mysql> select * from salary1;
++------------+---------+---------+
+| employeeID | income  | outcome |
++------------+---------+---------+
+| 000001     |  2100.8 |  123.09 |
+| 010008     | 1582.62 |   88.03 |
+| 020010     |    2860 |     198 |
+| 020018     | 2347.68 |     180 |
+| 102201     | 2569.88 |  185.65 |
+| 102208     |    1980 |     100 |
+| 108991     | 3259.98 |  281.52 |
+| 111006     | 1987.01 |   79.58 |
+| 210678     |    2240 |     121 |
+| 302566     |  2980.7 |   210.2 |
+| 308759     | 2531.98 |  199.08 |
+| 504209     | 2066.15 |     108 |
++------------+---------+---------+
+
+
+/*************************************************
+********** 实验3.1 存储过程实验 ****************
+
+//创建一个存储过程，计算employee表中的员工人数，并存储到
+一个局部变量中，并输出该变量结果，尝试调用存储过程
+delimiter $$
+create procedure count_employee3 ()  
+begin
+declare n1 INT(255);
+select COUNT(employeeID) into n1  from employee ;
+select n1;
+end $$
+delimiter ;
+call count_employee3 ();
+
+FUNCTION count does not exist
+解决方案：如sum() count() avg这些函数里面是这样子写的sum () sum和()分开了，
+不是挨着写的，所以报这个错
+
+//创建一个存储过程，比较两个员工的实际收入，若前者比后者高
+就输出0，否则输出1，员工用其员工编号识别
+delimiter $$
+create procedure compare_income (in employeeID1 char(6) ,in employeeID2 char(6))  
+begin
+declare income1 INT(255);
+declare income2 INT(255);
+declare result INT(255);
+set result = 0;
+select income into income1  from salary where employeeID = employeeID1;
+select income into income2  from salary where employeeID = employeeID2;
+if income1 > income2  then
+select result as result;
+else
+select (result+1) as result;
+end if;
+end $$
+delimiter ;
+call compare_income (010008,020010);
+
+//显示所有存储过程
+show procedure status where db='数据库名';
+show procedure status where db='dbem';
+
+
+
+
+/*************************************************
+********** 实验3.2 触发器实验 ********************
+
+//创建触发器，在 employee 表中删除员工信息的同时将salary表
+中该员工的信息删除，以确保数据完整性。创建完后尝试删除
+employee表中的一行数据，然后查看salary表中的变化情况
+
+delimiter $$
+create trigger t_employee_delete after delete on employee for each row
+begin
+delete from salary where employeeID=old.employeeID;
+end$$
+delimiter ;
+
+//当修改employee表时，若将employee表中的员工工作时间增加
+一年，则将收入增加500，增加两年则收入增加1000，以此类推
+
+delimiter $$
+create trigger t_update_employee after update on employee for each row
+begin
+declare n int;
+set n = new.workYear - old.workYear;
+update salary set income = (income + n * 500); 
+
+end $$
+delimiter ;
+
+
+/*************************************************
+********** 实验4.1 SQL语句备份与恢复实验 *********
+
+//用不同的存放格式（自由设计）备份DBEM数据库中的
+employee, salary两个基本表，其中employee表要求只备份
+employeeID, name, education 等三个字段
+
+//!!!!!!!!!! Q !!!!!!!!!!
+The MySQL server is running with the --secure-file-priv option 
+so it cannot execute this statement
+//A
+show variables like '%secure%';查看 secure-file-priv 当前的值是什么
+select * from salary into outfile 'E:\\mysql_backup\\salary_back2.csv'; 加上路径
+
+
+select * from salary into outfile select employeeID, name, education from employee into outfile 'E:\\mysql_backup\\employee_back2.txt'; 
+
+//根据上述任务所保存的文件，将相关数据恢复到基本表中，其中
+要求employee表在恢复之前事先
+中要求指定replace功能随机删除几条记录，SQL语句
+'E:\\mysql_backup\\salary_back2.txt'; 
+delete from salary;
+load data  infile 'E:\\mysql_backup\\salary_back2.txt' replace into table salary;
+
+
+/*************************************************
+********** 实验4.2 客户端工具备份与恢复实验 ******
+
+//使用mysqldump命令备份DBEM数据库中的employee表
+mysqldump -uroot -pweihuan dbem employee>E:\mysql_backup\back_employee.sql;
+
+//!!!!!!!!!! Q !!!!!!!!!!
+ERROR:
+Unknown command '\m'.
+ERROR:
+Unknown command '\b'.
+//A
+不是在 mysql 内执行，而是在 C:\Users\weihuan> 界面执行
+
+//!!!!!!!!!! Q !!!!!!!!!!
+mysqldump: Couldn't find table:
+//A
+把mysqldump命令后面的“;”去掉就可以了
+
+mysqldump -hlocalhost -uroot -p  dbem employee>E:\\mysql_backup\\back_employee.txt
+
+
+//使用mysqldump命令备份整个DBEM数据库
+mysqldump -hlocalhost -uroot -p  dbem >E:\\mysql_backup\\entire_database.sql
+
+//删除employee表，然后使用mysql命令，利用上述保存的文件恢复employee表
+//!!！ 注意这里数据库后面不加表名
+mysql  -uroot -p  dbem  < E:\\mysql_backup\\back_employee.sql
+
+//删除salary表的部分数据，然后使用mysqlimport命令及--
+replace功能恢复salary表，其中salary表的数据备份文件使用实
+验4.1中的文件
+//！这里注意文件 salary.txt 要和表名一致，而且仅仅是导入，数据库必须存在该表。
+mysqlimport -uroot -p --replace dbem E:\\mysql_backup\\salary.txt
+
+
+/*************************************************
+********** 实验5.1 自主存取控制实验 **************
+
+//创建用户user_1和user_2，密码都为1234
+create user 'user_1'@'localhost' identified by '1234'; 
+create user 'user_2'@'localhost' identified by '1234'; 
+
+//将用户user_2的名称修改为user_3，并将其密码修改为123456
+
+SET PASSWORD FOR 'user_2'@'localhost' = passwrod('123456');
+//!!!!!! Q !!!!!!!!!
+ERROR 1054 (42S22): Unknown column 'password' in 'field list'
+//原来是mysql数据库下已经没有password这个字段了，password字段改成了 authentication_string
+//A
+看文档
+https://dev.mysql.com/doc/refman/8.0/en/set-password.html
+应该是  SET PASSWORD FOR 'user_2'@'localhost' ='123456';
+
+//修改用户名和密码
+RENAME USER 'user_2'@'localhost' TO 'user_3'@'127.0.0.1';
+SET PASSWORD FOR 'user_2'@'localhost' ='123456';
+
+//以user_1身份登陆数据库
+mysql -uuser_1 -p1234
+
+//授予用户user_1对DBEM数据库中employee表的查询、插入、修改、删除等权限
+grant select, insert, update, delete on dbem.employee to 'user_1'@'localhost';
+
+//授予用户user_1对salary表的查询权限，并允许其将权限授予其他用
+户，然后用user_1登陆数据库并将salary表的查询权限授予user_3
+
+//刷新权限
+flush privileges;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
