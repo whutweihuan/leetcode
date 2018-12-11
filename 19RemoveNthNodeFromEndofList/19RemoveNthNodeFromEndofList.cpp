@@ -6,16 +6,16 @@
 #          Link: https://leetcode.com/problems/remove-nth-node-from-end-of-list/
 #         title: 19 Remove Nth Node From End of List
 #   Description: ---
-#	  Given a linked list, remove the n-th node from the end of list and return its head.
-#	  
-#	  Example:
-#	  
-#	  Given linked list: 1->2->3->4->5, and n = 2.
-#	  
-#	  After removing the second node from the end, the linked list becomes 1->2->3->5.
-#	  Note:
-#	  
-#	  Given n will always be valid.
+#      Given a linked list, remove the n-th node from the end of list and return its head.
+#      
+#      Example:
+#      
+#      Given linked list: 1->2->3->4->5, and n = 2.
+#      
+#      After removing the second node from the end, the linked list becomes 1->2->3->5.
+#      Note:
+#      
+#      Given n will always be valid.
 
 ***********************************************/
 #include <iostream>
@@ -62,14 +62,14 @@ public:
         int len = 0;
         //Count the length of link
         while(p){
-        	len++;
-        	p=p->next;
+            len++;
+            p=p->next;
         }
         //Remove head node
         if(len == n) {return head->next;}
         p = head;
         for(int i=0;i<len-n-1;i++){
-        	p = p->next;
+            p = p->next;
         }
         p->next = p->next->next;
         return head;
@@ -77,27 +77,27 @@ public:
 };
 
 int main(){
-	Solution ss;
-	ListNode * head = new ListNode(1);
-	ListNode * p = head;
-	for(int i=2;i<=5;i++){
-		p->next = new ListNode(i);
-		p = p->next;
-	}
+    Solution ss;
+    ListNode * head = new ListNode(1);
+    ListNode * p = head;
+    for(int i=2;i<=5;i++){
+        p->next = new ListNode(i);
+        p = p->next;
+    }
 
-	//ListNode * q = head;
+    //ListNode * q = head;
 
-	// while(q){
-	// 	cout<<q->val<<"\t";
-	// 	q = q->next;
-	// } 
-	// cout<<endl;
+    // while(q){
+    //     cout<<q->val<<"\t";
+    //     q = q->next;
+    // } 
+    // cout<<endl;
 
-	int n = 4;
+    int n = 4;
 
-	ListNode * newHead = ss.removeNthFromEnd(head,n);
-	while(newHead){
-		cout<<newHead->val<<"\t";
-		newHead = newHead->next;
-	} 
+    ListNode * newHead = ss.removeNthFromEnd(head,n);
+    while(newHead){
+        cout<<newHead->val<<"\t";
+        newHead = newHead->next;
+    } 
 }

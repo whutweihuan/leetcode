@@ -23,40 +23,65 @@
 
 using namespace std;
 
+// 8ms
+// class Solution {
+// public:
+//   bool isValid(vector<vector<char>>& B, int r, int c, char ch) {
+//     for (int i = 0; i < 9; ++i) {
+//       if (B[i][c] == ch) return false;
+//       if (B[r][i] == ch) return false;
+//       if (B[3 * (r / 3) + i / 3][3 * (c / 3) + i % 3] == ch) return false;
+//     }
+//     return true;
+//   }
+//   bool solve(vector<vector<char>>& B) {
+//     for (int i = 0; i < 9; ++i) {
+//       for (int j = 0; j < 9; ++j) if (B[i][j] == '.') {
+//         for (char c = '1'; c <= '9'; ++c) if (isValid(B, i, j, c)) {
+//           B[i][j] = c;
+//           if (solve(B)) return true;
+//           else B[i][j] = '.';
+//         }
+//         return false;
+//       }
+//     }
+//     return true;
+//   }
+//   void solveSudoku(vector<vector<char>>& board) {
+//     if (board.size() == 0) return;
+//     solve(board);
+//   }
+// };
+
+
+
+
+//20ms
 class Solution {
 private:
-    vector<vector<char>> result;
+    //vector<vector<char>> result;
     int ok = 0;
 public:
     void solveSudoku(vector<vector<char>>& board) {
-        dfs(board,0);
-        if(ok){
-            board = result;
-        }
-        else{
-            printf("没有解！\n");
-        }
-      
+        vector<vector<char>> temp (board);
+        dfs(board,0);     
+        if(!ok){
+            printf("No answer!\n");
+            board = temp;
+        }   
     }
 
-    bool dfs(vector<vector<char> >board,int index){
+    //引用传参很快
+    bool dfs(vector<vector<char> >& board,int index){
         if(index > 80) {
             ok = true;
-            result = board;
             return true;
         }
 
         int row = index/9;
         int col = index%9;
         if(board[row][col] != '.'){
-            if(index ==80){
-                 ok = true;
-                 result = board;
-                 return true;
-            }
-            else{
-                return dfs(board,index+1);
-            }
+            return dfs(board,index+1);
         }
 
         for(int x = '1';x<='9';x++){
@@ -66,6 +91,8 @@ public:
                     return true;
                 }
             }
+            //这里需要记得恢复原状
+            board[row][col] = '.';
         }
         return false;
     }
@@ -101,28 +128,28 @@ public:
 
 int main(){
     Solution ss;
-    // vector <vector<char>> board{
-    //        {'5','3','.','.','7','.','.','.','.'},
-    //        {'6','.','.','1','9','5','.','.','.'},
-    //        {'.','9','8','.','.','.','.','6','.'},
-    //        {'8','.','.','.','6','.','.','.','3'},
-    //        {'4','.','.','8','.','3','.','.','1'},
-    //        {'7','.','.','.','2','.','.','.','6'},
-    //        {'.','6','.','.','.','.','2','8','.'},
-    //        {'.','.','.','4','1','9','.','.','5'},
-    //        {'.','.','.','.','8','.','.','7','9'}
-    //  };
-     vector <vector<char>> board{
-        {'.','.','9','7','4','8','.','.','.'},
-        {'7','.','.','.','.','.','.','.','.'},
-        {'.','2','.','1','.','9','.','.','.'},
-        {'.','.','7','.','.','.','2','4','.'},
-        {'.','6','4','.','1','.','5','9','.'},
-        {'.','9','8','.','.','.','3','.','.'},
-        {'.','.','.','8','.','3','.','2','.'},
-        {'.','.','.','.','.','.','.','.','6'},
-        {'.','.','.','2','7','5','1','.','.'}
-    };
+    vector <vector<char>> board{
+           {'5','3','.','.','7','.','.','.','.'},
+           {'6','.','.','1','9','5','.','.','.'},
+           {'.','9','8','.','.','.','.','6','.'},
+           {'8','.','.','.','6','.','.','.','3'},
+           {'4','.','.','8','.','3','.','.','1'},
+           {'7','.','.','.','2','.','.','.','6'},
+           {'.','6','.','.','.','.','2','8','.'},
+           {'.','.','.','4','1','9','.','.','5'},
+           {'.','.','.','.','8','.','.','7','9'}
+     };
+    //  vector <vector<char>> board{
+    //     {'.','.','9','7','4','8','.','.','.'},
+    //     {'7','.','.','.','.','.','.','.','.'},
+    //     {'.','2','.','1','.','9','.','.','.'},
+    //     {'.','.','7','.','.','.','2','4','.'},
+    //     {'.','6','4','.','1','.','5','9','.'},
+    //     {'.','9','8','.','.','.','3','.','.'},
+    //     {'.','.','.','8','.','3','.','2','.'},
+    //     {'.','.','.','.','.','.','.','.','6'},
+    //     {'.','.','.','2','7','5','9','.','.'}
+    // };
 
      ss.solveSudoku(board);
 
@@ -135,5 +162,5 @@ int main(){
         }
         cout<<endl;
      }
-
+    getchar();
 }
