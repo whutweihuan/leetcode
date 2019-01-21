@@ -96,8 +96,8 @@ public:
 };
 
 int main(){
-	vector<int> candidates{6,5,4,3,9};
-	int target = 20;
+	vector<int> candidates{10,1,2,7,6,5};
+	int target = 8;
 	Solution ss;
 	vector<vector<int>> result = ss.combinationSum(candidates,target);
 	for(vector<int> com:result){
