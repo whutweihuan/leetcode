@@ -55,14 +55,14 @@ using namespace std;
 
 class Solution {
 private:
-	void swap4Value(vector<vector<int>>& matrix ,int idx1,int idx2,int idx3,int idx4){
-		int size = matrix.size();
-		int temp = matrix[idx1/size][idx1%size];
-		matrix[idx1/size][idx1%size] = matrix[idx4/size][idx4%size];
-		matrix[idx4/size][idx4%size] = matrix[idx3/size][idx3%size];
-		matrix[idx3/size][idx3%size] = matrix[idx2/size][idx2%size];
-		matrix[idx2/size][idx2%size] = temp;
-	}
+	// void swap4Value(vector<vector<int>>& matrix ,int idx1,int idx2,int idx3,int idx4){
+	// 	int size = matrix.size();
+	// 	int temp = matrix[idx1/size][idx1%size];
+	// 	matrix[idx1/size][idx1%size] = matrix[idx4/size][idx4%size];
+	// 	matrix[idx4/size][idx4%size] = matrix[idx3/size][idx3%size];
+	// 	matrix[idx3/size][idx3%size] = matrix[idx2/size][idx2%size];
+	// 	matrix[idx2/size][idx2%size] = temp;
+	// }
 
 // we can also use the function 
 // swap4Value(matrix,
