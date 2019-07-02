@@ -29,6 +29,28 @@ void printVector2D(vector<vector<int>> vec){
 	}
 }
 
+void printLink (ListNode * head){
+	while(head){
+		cout << head->val <<"\t";
+		head= head->next;
+	}
+	cout << endl;
+}
+
+ListNode* createList(int a[], int n)
+{
+    ListNode *head=NULL, *p=NULL;
+    for(int i=0; i<n; i++){
+        if (head == NULL){
+            head = p = new ListNode(a[i]);
+        }else{
+            p->next = new ListNode(a[i]);
+            p = p->next;
+        }
+    }
+    return head;
+}
+
 vector<string> & split(const string &s, char delim, vector<string> &elems) {
     stringstream ss(s);
     string item;
